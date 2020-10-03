@@ -5,6 +5,7 @@ using UnityEngine;
 public class LevelReset : MonoBehaviour
 {
     [SerializeField] GameEvent levelResetEvent;
+    [SerializeField] Timer timer;
 
     public Transform[] pickupableObjects;
 
@@ -21,6 +22,7 @@ public class LevelReset : MonoBehaviour
         ResetPickupableTransforms();
 
         // reset timer
+        timer.Reset();
 
         // reset player
 
