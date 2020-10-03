@@ -17,12 +17,12 @@ public class PlayerInteraction : MonoBehaviour
     private bool interacting;
     private bool rotatingObject;
 
-    private float rotationSpeed = 350f;
+    private float rotationSpeed = 500f;
 
     private Vector3 object_originalPos = Vector3.zero;
     private Quaternion object_originalRot = Quaternion.identity;
 
-    private float poop;
+    private GameObject lastSeenObject;
 
     private Vector3 object_desiredPos = Vector3.zero;
     private Vector3 velocity = Vector3.zero;
@@ -64,7 +64,7 @@ public class PlayerInteraction : MonoBehaviour
             MoveObjectToPoint();
         }
            
-        if (Input.GetKey(KeyCode.E))
+        if (Input.GetMouseButtonDown(1))
         {
             ReleaseObject();
         }
@@ -95,17 +95,41 @@ public class PlayerInteraction : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, raycastDistance) && hit.transform.CompareTag("Interactable"))
         {
+            lastSeenObject = hit.transform.gameObject;
+
+            OutlineObject(lastSeenObject);
+
             SetCursorSprite(hand_open);
 
             if (Input.GetMouseButtonDown(0))
             {
                 currentObject = hit.transform.gameObject;
+
+                
             }
         }
         else
         {
+            if(lastSeenObject != null) RemoveOutline(lastSeenObject);
+
             if (!interacting) interactImage.enabled = false;
         }
+    }
+
+    void OutlineObject(GameObject obj)
+    {
+        if (obj.GetComponent<Outline>() != null) return;
+
+        var outline = obj.AddComponent<Outline>();
+        outline.OutlineMode = Outline.Mode.OutlineAll;
+        outline.OutlineColor = Color.white;
+        outline.OutlineWidth = 10.0f;
+    }
+
+    void RemoveOutline(GameObject obj)
+    {
+        if (obj.GetComponent<Outline>() == null) return;
+        Destroy(obj.GetComponent<Outline>());
     }
 
 
@@ -161,6 +185,8 @@ public class PlayerInteraction : MonoBehaviour
 
         playerMovement.SetCanMove(false);
         playerMovement.UnlockCursor();
+
+        RemoveOutline(currentObject);
     }
 
     void ReleaseObject()
