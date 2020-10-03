@@ -11,18 +11,19 @@ public class PlayerInteraction : MonoBehaviour
 
     [Header("UI")]
     public Image interactImage;
-    public Sprite hand_open, hand_grabbing;
+    public Sprite hand_open, hand_grabbing, rotateSprite;
     public float raycastDistance;
 
     private bool interacting;
+    private bool rotatingObject;
+
+    private float rotationSpeed = 350f;
 
     private Vector3 object_originalPos = Vector3.zero;
     private Quaternion object_originalRot = Quaternion.identity;
 
     private Vector3 object_desiredPos = Vector3.zero;
     private Vector3 velocity = Vector3.zero;
-
-   
 
     private void Awake()
     {
@@ -52,7 +53,7 @@ public class PlayerInteraction : MonoBehaviour
         if (currentObject == null)
             return;
 
-        currentObject.transform.Rotate(new Vector3(0.0f, 0.25f, 0.0f));
+        RotateObject();
 
         object_desiredPos = playerCamera.transform.position + playerCamera.transform.forward * 2.0f;
 
@@ -71,14 +72,12 @@ public class PlayerInteraction : MonoBehaviour
     void MoveObjectToPoint()
     {
         currentObject.transform.position = Vector3.SmoothDamp(currentObject.transform.position, object_desiredPos, ref velocity, 0.2f);
-        //currentObject.transform.Rotate(new Vector3(0.1f, 0.1f, 0.0f));
     }
 
     void MoveObjectToOriginalPosition()
     {
         if (Vector3.Distance(currentObject.transform.position, object_originalPos) < 0.1f)
         {
-
             currentObject.transform.position = object_originalPos;
             currentObject.transform.rotation = object_originalRot;
             currentObject = null;
@@ -89,27 +88,66 @@ public class PlayerInteraction : MonoBehaviour
         currentObject.transform.rotation = Quaternion.Lerp(currentObject.transform.rotation, object_originalRot, 10.0f * Time.deltaTime);
     }
 
-
     void FireRaycast()
     {
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, raycastDistance) && hit.transform.CompareTag("Interactable"))
         {
-            interactImage.enabled = true;
-            interactImage.sprite = hand_open;
+            SetCursorSprite(hand_open);
 
             if (Input.GetMouseButtonDown(0))
             {
-                //objectDistance = Vector3.Distance(hit.transform.position, transform.position);
                 currentObject = hit.transform.gameObject;
             }
         }
         else
         {
-            if (!interacting)
-                interactImage.enabled = false;
+            if (!interacting) interactImage.enabled = false;
         }
     }
+
+
+    void RotateObject()
+    {
+        interactImage.transform.position = (Input.mousePosition);
+
+        // If the object is currently being dragged by the mouse, execute contents
+        if (rotatingObject)
+        {
+            if (Input.GetMouseButton(0))
+            {
+                currentObject.transform.Rotate((Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime), (-Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime), 0, Space.World);
+            }
+            else
+            {
+                interactImage.enabled = false;
+                rotatingObject = false;
+            }
+        }
+
+        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+        {
+            if ((hit.transform.gameObject == currentObject || hit.transform.IsChildOf(currentObject.transform)))
+            {
+                SetCursorSprite(rotateSprite);
+
+                if (Input.GetMouseButtonDown(0)) rotatingObject = true;
+            }
+            else
+            {
+                if (!rotatingObject) interactImage.enabled = false;
+            }
+        }
+    }
+
+    void SetCursorSprite(Sprite sprite)
+    {
+        interactImage.enabled = true;
+        interactImage.sprite = sprite;
+    }
+
 
     void HoldObject()
     {
@@ -121,20 +159,15 @@ public class PlayerInteraction : MonoBehaviour
 
         playerMovement.SetCanMove(false);
         playerMovement.UnlockCursor();
-
-        interactImage.enabled = false;
     }
 
     void ReleaseObject()
     {
         interacting = false;
 
-        //currentObject.transform.position = object_originalPos;
-        //currentObject.transform.rotation = object_originalRot;
-
         playerMovement.SetCanMove(true);
         playerMovement.LockCursor();
-        
-        //currentObject = null;
+
+        interactImage.transform.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
     }
 }
