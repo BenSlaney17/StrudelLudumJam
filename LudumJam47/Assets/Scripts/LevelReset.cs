@@ -22,7 +22,7 @@ public class LevelReset : MonoBehaviour
         ResetPickupableTransforms();
 
         // reset timer
-        timer.Reset();
+        timer?.Reset();
 
         // reset player
 
