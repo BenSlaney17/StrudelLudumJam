@@ -19,12 +19,13 @@ public class LevelReset : MonoBehaviour
     public void Reset()
     {
         // reset pickupable objects
-        ResetPickupableTransforms();
+        //ResetPickupableTransforms();
 
         // reset timer
         timer?.Reset();
 
         // reset player
+
 
         levelResetEvent.Raise();
     }

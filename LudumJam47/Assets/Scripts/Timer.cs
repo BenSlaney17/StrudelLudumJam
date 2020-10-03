@@ -6,14 +6,18 @@ public class Timer : MonoBehaviour
 {
     [SerializeField] float maxTime = 60f;
     [SerializeField] GameEvent timeUpEvent;
+    [SerializeField] AudioClip tickClip;
 
     private float _timer;
     private int _prevSecondValue;
     private TextMesh _text;
     private bool _isTiming;
+    private AudioSource _audioSource;
+
     private void Awake()
     {
         _text = GetComponentInChildren<TextMesh>();
+        _audioSource = GetComponent<AudioSource>();
     }
     // Start is called before the first frame update
     void Start()
@@ -32,6 +36,8 @@ public class Timer : MonoBehaviour
         if(curSecond != _prevSecondValue)
         {
             UpdateTimerText();
+            //AudioExtensions.AudioHandling.PlayClipWithRandomPitch(_audioSource, tickClip, 0.8f, 1f);
+            _audioSource.PlayOneShot(tickClip);
             _prevSecondValue = curSecond;
         }
 
