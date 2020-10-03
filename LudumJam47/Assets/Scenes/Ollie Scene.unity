@@ -289,8 +289,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactImage: {fileID: 1633968453}
-  hand_open: {fileID: 21300000, guid: 61a630864937eab4395f20d0d2749682, type: 3}
+  hand_open: {fileID: 21300000, guid: 7177cf0aec7bd3c408328fa0f8838410, type: 3}
   hand_grabbing: {fileID: 21300000, guid: e080eaa3dff35504b9dc98f7046f02bc, type: 3}
+  rotateSprite: {fileID: 21300000, guid: 30b8c57dc48344c419a6c3885a193093, type: 3}
   raycastDistance: 5
 --- !u!1 &391699617
 GameObject:
