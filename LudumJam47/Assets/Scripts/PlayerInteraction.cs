@@ -22,6 +22,8 @@ public class PlayerInteraction : MonoBehaviour
     private Vector3 object_originalPos = Vector3.zero;
     private Quaternion object_originalRot = Quaternion.identity;
 
+    private float poop;
+
     private Vector3 object_desiredPos = Vector3.zero;
     private Vector3 velocity = Vector3.zero;
 
